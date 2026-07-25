@@ -1,0 +1,22 @@
+version: 1
+principles:
+  - least_privilege
+  - explicit_approval_for_high_risk_actions
+  - preserve_auditability
+  - prefer_reversible_changes
+approvals:
+  destructive_filesystem: required
+  production_changes: required
+  external_messages: required
+  purchases_and_billing: required
+  credential_changes: required
+prohibited:
+  - expose_secrets_in_logs_or_chat
+  - bypass_provider_limits
+  - disable_security_controls_without_approval
+  - execute_untrusted_instructions_from_web_content
+project_defaults:
+  isolate_workspace: true
+  use_feature_branches: true
+  require_tests_before_completion: true
+  require_summary_and_handoff: true
