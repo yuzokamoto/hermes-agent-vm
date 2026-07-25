@@ -1,0 +1,33 @@
+# Local secrets and environment
+.env
+.env.*
+!.env.example
+
+# Hermes runtime state
+.hermes/
+config.yaml
+sessions/
+logs/
+memory/
+
+# Credentials and keys
+*.pem
+*.key
+*.p12
+*.pfx
+credentials.json
+secrets.yaml
+
+# Tooling
+.venv/
+__pycache__/
+*.py[cod]
+.DS_Store
+.idea/
+.vscode/
+
+# Infrastructure state
+*.tfstate
+*.tfstate.*
+.terraform/
+crash.log
