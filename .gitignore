@@ -25,9 +25,3 @@ __pycache__/
 .DS_Store
 .idea/
 .vscode/
-
-# Infrastructure state
-*.tfstate
-*.tfstate.*
-.terraform/
-crash.log
