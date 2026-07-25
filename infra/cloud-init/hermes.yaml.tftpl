@@ -1,0 +1,41 @@
+#cloud-config
+package_update: true
+package_upgrade: true
+
+users:
+  - default
+  - name: hermes
+    gecos: Hermes Agent
+    groups: [sudo]
+    shell: /bin/bash
+    sudo: ["ALL=(ALL) NOPASSWD:ALL"]
+    ssh_authorized_keys:
+      - ${ssh_public_key}
+
+ssh_pwauth: false
+disable_root: true
+
+packages:
+  - ca-certificates
+  - curl
+  - git
+  - jq
+  - ufw
+
+write_files:
+  - path: /etc/profile.d/hermes.sh
+    permissions: "0644"
+    content: |
+      export HERMES_HOME=/home/hermes/.hermes
+      export PATH=/home/hermes/.local/bin:$PATH
+
+runcmd:
+  - [bash, -lc, "ufw default deny incoming"]
+  - [bash, -lc, "ufw default allow outgoing"]
+  - [bash, -lc, "ufw allow OpenSSH"]
+  - [bash, -lc, "ufw --force enable"]
+  - [bash, -lc, "install -d -o hermes -g hermes -m 0700 /home/hermes/.hermes"]
+  - [sudo, -u, hermes, -H, bash, -lc, "curl -fsSL https://hermes-agent.nousresearch.com/install.sh | bash -s -- --skip-setup"]
+  - [bash, -lc, "touch /var/lib/hermes-agent-bootstrap-complete"]
+
+final_message: "Hermes Agent VM bootstrap completed after $UPTIME seconds"
