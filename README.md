@@ -1,59 +1,70 @@
 # hermes-agent-vm
 
-Reproducible, versioned configuration for provisioning and operating Hermes Agent virtual machines.
+A reproducible, security-conscious local AI-agent workstation for VMware Workstation Pro on Windows 11.
 
-## Goals
+## Supported baseline
 
-- Rebuild a VM from source-controlled configuration.
-- Keep instructions readable by humans and LLM agents.
-- Make changes reviewable, testable, and reversible.
-- Keep secrets outside the repository.
+- Ubuntu Server 24.04 LTS amd64, minimal installation
+- VMware Workstation Pro
+- Recommended VM: 8 vCPU, 16 GB RAM, 150 GB thin-provisioned disk, UEFI, NAT and 3D acceleration
+- OpenSSH selected during Ubuntu installation
 
-## Current scope
+Do not customize the guest manually before running this repository. The bootstrap owns system packages, shell defaults, GUI, development tools and Hermes installation.
 
-The repository currently provides a cloud-agnostic Hermes bootstrap and validation layer. Cloud-specific infrastructure will be added after selecting the provider and target VM shape.
+## What this repository configures
 
-Hermes is installed through its official installer. Runtime data lives under `HERMES_HOME` (default: `~/.hermes`) and must remain outside this repository checkout.
+- apt update/full-upgrade, unattended security updates and firewall
+- Bash, tmux, Git/GitHub CLI and common Unix development tools
+- optional XFCE desktop with VMware guest integration and browsers
+- Node.js 22, Python tooling, uv, Docker, Codex CLI, Claude Code and Promptfoo
+- Hermes Agent installed through its official installer
+- managed safety policy, project context and profile contract
+- restic backup for Hermes state, workspaces and durable knowledge
+- verification and safe-suspend procedures
 
-## Requirements
+The first milestone deliberately avoids unsupported guessed Hermes configuration keys. Release-specific provider routing, Kanban workers, gateway and dashboard settings are applied only after `hermes setup` and schema verification on the installed stable release.
 
-- Linux VM or compatible environment
-- Git
-- curl
-- GNU Make
-
-The official Hermes installer manages its own Python, Node.js, `uv`, ripgrep, ffmpeg, source checkout, and virtual environment.
-
-## Usage
+## First run
 
 ```bash
 git clone https://github.com/yuzokamoto/hermes-agent-vm.git
 cd hermes-agent-vm
-
+cp .env.example .env
+nano .env
 make bootstrap
-hermes setup
+sudo reboot
+```
+
+After reboot:
+
+```bash
+cd hermes-agent-vm
+make configure
+make verify
+```
+
+Complete the interactive logins printed by `make configure`. OAuth/session material must not be stored in `.env` or committed.
+
+## Operations
+
+```bash
+make verify
+make backup
+make safe-suspend
+make eval
 make validate
 ```
 
-`make bootstrap` installs Hermes when absent and runs `hermes update` when it is already present. It intentionally skips interactive setup so credentials are never encoded in provisioning scripts.
+Always run `make safe-suspend` before suspending or shutting down the VMware guest while it holds active project state.
 
-## Commands
+## Security model
 
-```bash
-make bootstrap  # install or update Hermes
-make validate   # inspect repository safety and run hermes doctor
-make deploy     # bootstrap, then validate
-```
+- Production access is disabled by default.
+- Destructive changes, external messages, purchases and credential changes require approval.
+- WhatsApp should use a dedicated account and an allowlist containing only the owner's personal number.
+- Hermes memory is not the sole source of truth; durable decisions belong in project repositories and backups.
+- Secrets remain in scoped provider stores or interactive OAuth sessions, not Git.
 
-## Repository contract
+## Legacy cloud work
 
-- `AGENTS.md` defines how automated agents must work in this repository.
-- `docs/` contains architecture and operational decisions.
-- `config/` contains declarative, non-secret configuration templates.
-- `scripts/` contains idempotent operational scripts.
-- `infra/` will contain cloud and VM provisioning definitions.
-- `references/` records external sources used by the project.
-
-## Security
-
-Never commit credentials, API keys, private keys, tokens, generated `.env` files, Hermes sessions, logs, or memory. Use `.env.example` only to document non-secret settings, and use `hermes setup` or a cloud secret manager for credentials.
+The existing `infra/` directory is retained as experimental history. It is not part of the supported local-workstation workflow and may be removed or moved to a separate repository after this baseline is validated.

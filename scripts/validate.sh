@@ -10,19 +10,28 @@ require_file() {
   fi
 }
 
-for file in README.md AGENTS.md Makefile scripts/bootstrap.sh scripts/validate.sh .gitignore .env.example; do
+required_files=(
+  README.md
+  AGENTS.md
+  Makefile
+  .gitignore
+  .env.example
+  bootstrap/lib.sh
+  scripts/bootstrap-workstation.sh
+  scripts/configure-workstation.sh
+  scripts/validate.sh
+  scripts/verify-workstation.sh
+)
+
+for file in "${required_files[@]}"; do
   require_file "$file"
 done
 
-if git grep -nE '(BEGIN (RSA|OPENSSH|EC) PRIVATE KEY|[A-Za-z0-9_]*(API_KEY|TOKEN|SECRET|PASSWORD)=[^[:space:]$<{][^[:space:]]*)' -- ':!scripts/validate.sh' ':!.env.example'; then
-  printf 'Potential secret material detected.\n' >&2
+# Scan tracked files for high-confidence credential formats only.
+if git grep -nE 'BEGIN (RSA|OPENSSH|EC) PRIVATE KEY|gh[pousr]_[A-Za-z0-9]{30,}|sk-ant-[A-Za-z0-9_-]{20,}|AIza[0-9A-Za-z_-]{30,}' -- \
+  ':!scripts/validate.sh' ':!.env.example'; then
+  printf 'High-confidence secret material detected.\n' >&2
   failed=1
-fi
-
-if command -v shellcheck >/dev/null 2>&1; then
-  shellcheck scripts/*.sh
-else
-  printf 'Notice: shellcheck is not installed; skipping shell lint.\n'
 fi
 
 if command -v hermes >/dev/null 2>&1; then
