@@ -1,6 +1,0 @@
-server_name    = "hermes-agent"
-server_type    = "cx22"
-location       = "fsn1"
-image          = "ubuntu-24.04"
-ssh_public_key = "ssh-ed25519 AAAA... operator@example"
-admin_cidr     = "203.0.113.10/32"
