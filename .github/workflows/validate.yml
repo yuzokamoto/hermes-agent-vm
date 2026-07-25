@@ -23,6 +23,14 @@ jobs:
       - name: Validate repository contract and secrets
         run: make validate
 
+      - name: Check Bash syntax
+        run: |
+          find bootstrap scripts -type f -name '*.sh' -print0 |
+            while IFS= read -r -d '' script; do
+              echo "Checking $script"
+              bash -n "$script"
+            done
+
       - name: Lint operational scripts
         run: shellcheck -x -e SC1091 scripts/*.sh
 
