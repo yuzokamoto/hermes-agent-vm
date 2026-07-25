@@ -9,8 +9,30 @@ permissions:
   contents: read
 
 jobs:
-  validate:
-    runs-on: ubuntu-latest
+  workstation:
+    name: Workstation configuration
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install validation tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y shellcheck
+
+      - name: Validate repository contract and secrets
+        run: make validate
+
+      - name: Lint operational scripts
+        run: shellcheck -x -e SC1091 scripts/*.sh
+
+      - name: Lint bootstrap scripts
+        run: shellcheck -x -e SC1091 bootstrap/*.sh
+
+  legacy-infrastructure:
+    name: Legacy OpenTofu configuration
+    runs-on: ubuntu-24.04
+    if: ${{ hashFiles('infra/opentofu/**/*.tf') != '' }}
     steps:
       - uses: actions/checkout@v4
 
@@ -18,12 +40,6 @@ jobs:
         uses: opentofu/setup-opentofu@v1
         with:
           tofu_version: "1.8.8"
-
-      - name: Install ShellCheck
-        run: sudo apt-get update && sudo apt-get install -y shellcheck
-
-      - name: Validate repository
-        run: make validate
 
       - name: Check OpenTofu formatting
         run: tofu -chdir=infra/opentofu fmt -check -recursive
