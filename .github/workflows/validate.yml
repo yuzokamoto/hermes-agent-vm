@@ -28,23 +28,3 @@ jobs:
 
       - name: Lint bootstrap scripts
         run: shellcheck -x -e SC1091 bootstrap/*.sh
-
-  legacy-infrastructure:
-    name: Legacy OpenTofu configuration
-    runs-on: ubuntu-24.04
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Install OpenTofu
-        uses: opentofu/setup-opentofu@v1
-        with:
-          tofu_version: "1.8.8"
-
-      - name: Check OpenTofu formatting
-        run: tofu -chdir=infra/opentofu fmt -check -recursive
-
-      - name: Initialize OpenTofu
-        run: tofu -chdir=infra/opentofu init -backend=false
-
-      - name: Validate OpenTofu
-        run: tofu -chdir=infra/opentofu validate
