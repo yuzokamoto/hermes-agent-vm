@@ -1,36 +1,39 @@
 SHELL := /usr/bin/env bash
 .DEFAULT_GOAL := help
 
-TOFU_DIR := infra/opentofu
-
-.PHONY: help bootstrap validate deploy infra-init infra-plan infra-apply infra-destroy
+.PHONY: help bootstrap configure verify backup safe-suspend eval validate legacy-infra-plan
 
 help:
 	@printf '%s\n' \
-	  'make bootstrap      Install or update Hermes Agent for the current user' \
-	  'make validate       Validate repository files and the local Hermes installation' \
-	  'make deploy         Run bootstrap followed by validation' \
-	  'make infra-init     Initialize OpenTofu providers' \
-	  'make infra-plan     Preview VM infrastructure changes' \
-	  'make infra-apply    Provision or update the VM' \
-	  'make infra-destroy  Destroy the managed VM infrastructure'
+	  'make bootstrap      Configure a clean Ubuntu 24.04 VMware workstation' \
+	  'make configure      Install managed Hermes policy and guide OAuth setup' \
+	  'make verify         Run workstation health and dependency checks' \
+	  'make backup         Back up Hermes, workspaces and knowledge with restic' \
+	  'make safe-suspend   Verify, back up and sync before suspending VMware' \
+	  'make eval           Run prompt/provider regression evaluations' \
+	  'make validate       Lint repository shell scripts and environment contract'
 
 bootstrap:
-	@bash scripts/bootstrap.sh
+	@bash scripts/bootstrap-workstation.sh
+
+configure:
+	@bash scripts/configure-workstation.sh
+
+verify:
+	@bash scripts/verify-workstation.sh
+
+backup:
+	@bash scripts/backup.sh
+
+safe-suspend:
+	@bash scripts/safe-suspend.sh
+
+eval:
+	@npx promptfoo eval -c evals/promptfooconfig.yaml
 
 validate:
-	@bash scripts/validate.sh
-
-infra-init:
-	@tofu -chdir=$(TOFU_DIR) init
-
-infra-plan: infra-init
-	@tofu -chdir=$(TOFU_DIR) plan
-
-infra-apply: infra-init
-	@tofu -chdir=$(TOFU_DIR) apply
-
-infra-destroy: infra-init
-	@tofu -chdir=$(TOFU_DIR) destroy
-
-deploy: bootstrap validate
+	@find bootstrap scripts -type f -name '*.sh' -print0 | xargs -0 -n1 bash -n
+	@find bootstrap scripts -type f -name '*.sh' -print0 | xargs -0 shellcheck
+	@test -f .env.example
+	@grep -q '^WORKSTATION_USER=' .env.example
+	@grep -q '^RESTIC_PASSWORD=' .env.example
