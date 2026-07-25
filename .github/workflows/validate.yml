@@ -21,7 +21,7 @@ jobs:
           sudo apt-get install -y -qq shellcheck >/dev/null
 
       - name: Validate repository contract and secrets
-        run: scripts/validate.sh
+        run: bash scripts/validate.sh
 
       - name: Check Bash syntax
         run: |
