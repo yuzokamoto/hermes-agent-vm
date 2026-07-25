@@ -9,25 +9,51 @@ Reproducible, versioned configuration for provisioning and operating Hermes Agen
 - Make changes reviewable, testable, and reversible.
 - Keep secrets outside the repository.
 
-## Repository contract
+## Current scope
 
-- `AGENTS.md` defines how automated agents must work in this repository.
-- `docs/` contains architecture and operational decisions.
-- `config/` contains declarative agent, prompt, and policy configuration.
-- `scripts/` contains idempotent operational scripts.
-- `infra/` contains infrastructure and machine provisioning definitions.
-- `references/` records external sources used by the project.
+The repository currently provides a cloud-agnostic Hermes bootstrap and validation layer. Cloud-specific infrastructure will be added after selecting the provider and target VM shape.
+
+Hermes is installed through its official installer. Runtime data lives under `HERMES_HOME` (default: `~/.hermes`) and must remain outside this repository checkout.
+
+## Requirements
+
+- Linux VM or compatible environment
+- Git
+- curl
+- GNU Make
+
+The official Hermes installer manages its own Python, Node.js, `uv`, ripgrep, ffmpeg, source checkout, and virtual environment.
+
+## Usage
+
+```bash
+git clone https://github.com/yuzokamoto/hermes-agent-vm.git
+cd hermes-agent-vm
+
+make bootstrap
+hermes setup
+make validate
+```
+
+`make bootstrap` installs Hermes when absent and runs `hermes update` when it is already present. It intentionally skips interactive setup so credentials are never encoded in provisioning scripts.
 
 ## Commands
 
 ```bash
-make bootstrap
-make validate
-make deploy
+make bootstrap  # install or update Hermes
+make validate   # inspect repository safety and run hermes doctor
+make deploy     # bootstrap, then validate
 ```
 
-The commands are placeholders until the target cloud, operating system, and deployment model are selected.
+## Repository contract
+
+- `AGENTS.md` defines how automated agents must work in this repository.
+- `docs/` contains architecture and operational decisions.
+- `config/` contains declarative, non-secret configuration templates.
+- `scripts/` contains idempotent operational scripts.
+- `infra/` will contain cloud and VM provisioning definitions.
+- `references/` records external sources used by the project.
 
 ## Security
 
-Never commit credentials, API keys, private keys, tokens, or generated `.env` files. Use `.env.example` only to document required variables.
+Never commit credentials, API keys, private keys, tokens, generated `.env` files, Hermes sessions, logs, or memory. Use `.env.example` only to document non-secret settings, and use `hermes setup` or a cloud secret manager for credentials.
