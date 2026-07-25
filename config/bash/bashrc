@@ -1,0 +1,13 @@
+export EDITOR=nano
+export VISUAL="$EDITOR"
+export HISTCONTROL=ignoreboth:erasedups
+export HISTSIZE=50000
+export HISTFILESIZE=100000
+shopt -s histappend checkwinsize
+export PATH="$HOME/.local/bin:$HOME/.cargo/bin:$PATH"
+alias ll='ls -alF'
+alias gs='git status -sb'
+alias gd='git diff'
+alias ..='cd ..'
+command -v fdfind >/dev/null && alias fd=fdfind
+command -v batcat >/dev/null && alias bat=batcat
