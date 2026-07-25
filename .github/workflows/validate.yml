@@ -1,0 +1,35 @@
+name: Validate
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install OpenTofu
+        uses: opentofu/setup-opentofu@v1
+        with:
+          tofu_version: "1.8.8"
+
+      - name: Install ShellCheck
+        run: sudo apt-get update && sudo apt-get install -y shellcheck
+
+      - name: Validate repository
+        run: make validate
+
+      - name: Check OpenTofu formatting
+        run: tofu -chdir=infra/opentofu fmt -check -recursive
+
+      - name: Initialize OpenTofu
+        run: tofu -chdir=infra/opentofu init -backend=false
+
+      - name: Validate OpenTofu
+        run: tofu -chdir=infra/opentofu validate
