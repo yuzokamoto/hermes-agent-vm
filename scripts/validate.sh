@@ -53,7 +53,9 @@ for script in "${shell_scripts[@]}"; do
 done
 
 if command -v shellcheck >/dev/null 2>&1; then
-  shellcheck -x "${shell_scripts[@]}"
+  # Bootstrap steps load lib.sh relative to their runtime location. ShellCheck
+  # cannot resolve that dynamic path statically, so SC1091 is excluded only.
+  shellcheck -x -e SC1091 "${shell_scripts[@]}"
 else
   printf 'Notice: shellcheck is not installed; skipping shell lint.\n'
 fi
