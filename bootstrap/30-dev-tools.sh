@@ -3,10 +3,6 @@ set -Eeuo pipefail
 source "$(dirname "$0")/lib.sh"
 load_env
 
-if ! command_exists uv; then
-  curl -LsSf https://astral.sh/uv/install.sh | sh
-fi
-
 if ! command_exists mise; then
   sudo add-apt-repository -y ppa:jdxcode/mise
   sudo apt-get update
