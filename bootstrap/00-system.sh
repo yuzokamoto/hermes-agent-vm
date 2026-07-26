@@ -16,7 +16,7 @@ sudo DEBIAN_FRONTEND=noninteractive apt-get install -y \
   build-essential ca-certificates curl wget gnupg jq unzip zip p7zip-full \
   git git-lfs gh ripgrep fd-find fzf bat tree htop btop ncdu tmux \
   shellcheck shfmt python3 python3-venv python3-pip pipx sqlite3 \
-  openssh-server ufw fail2ban unattended-upgrades restic open-vm-tools
+  openssh-server ufw fail2ban unattended-upgrades open-vm-tools
 sudo apt-get autoremove -y
 
 sudo timedatectl set-timezone "$TIMEZONE"
