@@ -1,15 +1,14 @@
 SHELL := /usr/bin/env bash
 .DEFAULT_GOAL := help
 
-.PHONY: help bootstrap configure verify backup safe-suspend eval validate
+.PHONY: help bootstrap configure verify safe-suspend eval validate
 
 help:
 	@printf '%s\n' \
 	  'make bootstrap      Configure a clean Ubuntu 24.04 VMware workstation' \
 	  'make configure      Install managed Hermes policy and guide OAuth setup' \
 	  'make verify         Run workstation health and dependency checks' \
-	  'make backup         Back up Hermes, workspaces and knowledge with restic' \
-	  'make safe-suspend   Verify, back up and sync before suspending VMware' \
+	  'make safe-suspend   Verify and sync before suspending VMware' \
 	  'make eval           Run prompt/provider regression evaluations' \
 	  'make validate       Check Bash syntax, blocking ShellCheck errors and environment contract'
 
@@ -22,9 +21,6 @@ configure:
 verify:
 	@bash scripts/verify-workstation.sh
 
-backup:
-	@bash scripts/backup.sh
-
 safe-suspend:
 	@bash scripts/safe-suspend.sh
 
@@ -36,4 +32,3 @@ validate:
 	@find bootstrap scripts -type f -name '*.sh' -print0 | xargs -0 shellcheck -S error -x -e SC1091
 	@test -f .env.example
 	@grep -q '^WORKSTATION_USER=' .env.example
-	@grep -q '^RESTIC_PASSWORD=' .env.example
