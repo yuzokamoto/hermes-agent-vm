@@ -9,29 +9,36 @@ for key in "${required[@]}"; do
   [[ -n ${!key:-} ]] || { echo "Missing required .env value: $key" >&2; exit 1; }
 done
 
+[[ "$WORKSTATION_USER" == "$USER" ]] || {
+  echo "WORKSTATION_USER=$WORKSTATION_USER does not match the current user: $USER" >&2
+  exit 1
+}
+
 install -d -m 700 "$HERMES_HOME/policies" "$HERMES_HOME/profiles" "$HERMES_HOME/context"
 install -m 0600 hermes/policies/safety.yaml "$HERMES_HOME/policies/safety.yaml"
 install -m 0600 hermes/context/WORKSTATION.md "$HERMES_HOME/context/WORKSTATION.md"
 cp -a hermes/profiles/. "$HERMES_HOME/profiles/"
 
 if [[ ${BACKUP_ENABLED:-true} == true ]]; then
-  if [[ -z ${RESTIC_PASSWORD:-} ]]; then
+  [[ -n ${RESTIC_PASSWORD:-} ]] || {
     echo "RESTIC_PASSWORD is required when BACKUP_ENABLED=true" >&2
     exit 1
-  fi
-  mkdir -p "${RESTIC_REPOSITORY/#\$HOME/$HOME}"
-  RESTIC_PASSWORD="$RESTIC_PASSWORD" restic -r "$RESTIC_REPOSITORY" snapshots >/dev/null 2>&1 || \
-    RESTIC_PASSWORD="$RESTIC_PASSWORD" restic -r "$RESTIC_REPOSITORY" init
+  }
+  repository="${RESTIC_REPOSITORY/#\$HOME/$HOME}"
+  mkdir -p "$repository"
+  RESTIC_PASSWORD="$RESTIC_PASSWORD" restic -r "$repository" snapshots >/dev/null 2>&1 || \
+    RESTIC_PASSWORD="$RESTIC_PASSWORD" restic -r "$repository" init
 fi
 
 cat <<'EOF'
 Automated configuration installed.
-Complete these interactive authentications now:
+Complete the interactive authentications you actually use:
   gh auth login
   codex login
   claude auth login
-  hermes setup
+  hermes auth
 
-When WhatsApp is enabled, configure the Hermes gateway with Baileys and restrict it to WHATSAPP_ALLOWED_NUMBER.
-Then run: make verify
+Then initialize Hermes and verify the workstation:
+  hermes skills list
+  make verify
 EOF
