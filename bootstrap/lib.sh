@@ -19,13 +19,21 @@ load_env() {
   : "${HERMES_HOME:=$HOME/.hermes}"
 }
 
-require_ubuntu_2404() {
+require_supported_ubuntu() {
   # shellcheck disable=SC1091
   source /etc/os-release
-  if [[ "$ID" != ubuntu || "$VERSION_ID" != 24.04* ]]; then
-    echo "Supported baseline: Ubuntu 24.04 LTS. Found: $PRETTY_NAME" >&2
+  if [[ "$ID" != ubuntu ]]; then
+    echo "Supported operating system: Ubuntu 24.04 or 26.04 LTS. Found: $PRETTY_NAME" >&2
     exit 1
   fi
+
+  case "$VERSION_ID" in
+    24.04*|26.04*) ;;
+    *)
+      echo "Supported baselines: Ubuntu 24.04 and 26.04 LTS. Found: $PRETTY_NAME" >&2
+      exit 1
+      ;;
+  esac
 }
 
 command_exists() { command -v "$1" >/dev/null 2>&1; }
