@@ -16,6 +16,7 @@ required_files=(
   Makefile
   .gitignore
   .env.example
+  mise.toml
   bootstrap/lib.sh
   scripts/bootstrap-workstation.sh
   scripts/configure-workstation.sh
@@ -26,6 +27,23 @@ required_files=(
 for file in "${required_files[@]}"; do
   require_file "$file"
 done
+
+for forbidden in infra cloud-init opentofu terraform; do
+  if [[ -e "$forbidden" ]]; then
+    printf 'Out-of-scope VM orchestration artifact found: %s\n' "$forbidden" >&2
+    failed=1
+  fi
+done
+
+if ! grep -q '^PACKAGE_MINIMUM_RELEASE_AGE=3d$' .env.example; then
+  printf 'Supply-chain release-age policy is missing or changed.\n' >&2
+  failed=1
+fi
+
+if ! grep -q 'slsa = true' mise.toml; then
+  printf 'mise SLSA verification must remain enabled.\n' >&2
+  failed=1
+fi
 
 # Scan tracked files for high-confidence credential formats only.
 if git grep -nE 'BEGIN (RSA|OPENSSH|EC) PRIVATE KEY|gh[pousr]_[A-Za-z0-9]{30,}|sk-ant-[A-Za-z0-9_-]{20,}|AIza[0-9A-Za-z_-]{30,}' -- \
