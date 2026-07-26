@@ -4,7 +4,7 @@
 
 This repository is the source of truth for configuring one complete Hermes Agent workstation on Ubuntu Desktop inside VMware Workstation Pro.
 
-It does not provision, clone, schedule, inventory or orchestrate virtual machines.
+It does not provision, clone, schedule, inventory, snapshot or orchestrate virtual machines.
 
 ## Operating rules
 
@@ -18,13 +18,14 @@ It does not provision, clone, schedule, inventory or orchestrate virtual machine
 8. Preserve the three-day minimum release-age policy unless a reviewed exception is documented.
 9. Make the smallest coherent change and update documentation in the same change.
 10. Run `make validate` before publishing changes.
+11. Treat VMware snapshots and recovery as external manual operations, not repository-managed behavior.
 
 ## Repository layout
 
 - `bootstrap/`: idempotent workstation installation steps.
 - `config/`: versioned, non-secret shell and tool configuration.
 - `hermes/`: managed Hermes policies, profiles and workstation context.
-- `scripts/`: validation, configuration, backup and maintenance commands.
+- `scripts/`: validation, configuration and workstation maintenance commands.
 - `evals/`: prompt and provider regression evaluation configuration.
 - `docs/`: architecture, operations and decisions.
 - `references/`: source URLs and research notes.
