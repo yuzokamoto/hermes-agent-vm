@@ -19,17 +19,6 @@ install -m 0600 hermes/policies/safety.yaml "$HERMES_HOME/policies/safety.yaml"
 install -m 0600 hermes/context/WORKSTATION.md "$HERMES_HOME/context/WORKSTATION.md"
 cp -a hermes/profiles/. "$HERMES_HOME/profiles/"
 
-if [[ ${BACKUP_ENABLED:-true} == true ]]; then
-  [[ -n ${RESTIC_PASSWORD:-} ]] || {
-    echo "RESTIC_PASSWORD is required when BACKUP_ENABLED=true" >&2
-    exit 1
-  }
-  repository="${RESTIC_REPOSITORY/#\$HOME/$HOME}"
-  mkdir -p "$repository"
-  RESTIC_PASSWORD="$RESTIC_PASSWORD" restic -r "$repository" snapshots >/dev/null 2>&1 || \
-    RESTIC_PASSWORD="$RESTIC_PASSWORD" restic -r "$repository" init
-fi
-
 cat <<'EOF'
 Automated configuration installed.
 Complete the interactive authentications you actually use:
