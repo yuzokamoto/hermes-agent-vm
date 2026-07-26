@@ -10,7 +10,7 @@ check() {
   if "$@" >/dev/null 2>&1; then printf 'PASS  %s\n' "$name"; else printf 'FAIL  %s\n' "$name"; fail=1; fi
 }
 
-check "Ubuntu 24.04" bash -c 'source /etc/os-release; [[ "$ID" == ubuntu && "$VERSION_ID" == 24.04* ]]'
+check "Supported Ubuntu LTS" bash -c 'source /etc/os-release; [[ "$ID" == ubuntu && ("$VERSION_ID" == 24.04* || "$VERSION_ID" == 26.04*) ]]'
 for cmd in git gh tmux node npm python3 uv docker codex claude promptfoo restic hermes; do
   check "$cmd" command -v "$cmd"
 done
