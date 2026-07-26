@@ -8,7 +8,7 @@ fi
 
 source "$(dirname "$0")/lib.sh"
 load_env
-require_ubuntu_2404
+require_supported_ubuntu
 
 sudo apt-get update
 sudo DEBIAN_FRONTEND=noninteractive apt-get full-upgrade -y
