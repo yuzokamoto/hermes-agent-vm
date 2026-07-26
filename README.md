@@ -21,8 +21,7 @@ The repository configures one workstation. It does not provision, clone, schedul
 - Docker from Ubuntu packages when enabled
 - Hermes Agent through its official installer
 - managed Hermes safety policy, project context and profile contract
-- restic backup for Hermes state, workspaces and durable knowledge
-- verification and safe-suspend procedures
+- verification and snapshot-ready suspend procedures
 
 ## First run
 
@@ -52,13 +51,12 @@ Provider credentials and OAuth sessions must remain in their own credential stor
 
 ```bash
 make verify
-make backup
 make safe-suspend
 make eval
 make validate
 ```
 
-Run `make safe-suspend` before suspending or shutting down a guest that holds active project state.
+Run `make safe-suspend` before suspending, shutting down or creating a manual VMware snapshot of a guest that holds active project state. VM snapshots, including the golden snapshot, are managed manually outside this repository.
 
 ## Supply-chain policy
 
@@ -75,5 +73,5 @@ The age gate reduces exposure to newly compromised releases, but it is not a sub
 
 - Production access is disabled by policy unless explicitly approved.
 - Destructive changes, external messages, purchases and credential changes require approval.
-- Hermes memory is not the sole source of truth; durable decisions belong in project repositories and backups.
+- Hermes memory is not the sole source of truth; durable decisions belong in project repositories and external recovery mechanisms.
 - Secrets remain in scoped provider stores or interactive OAuth sessions, not Git.
