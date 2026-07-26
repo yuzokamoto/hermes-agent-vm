@@ -18,7 +18,3 @@ if [[ ${INSTALL_DOCKER:-true} == true ]] && ! command_exists docker; then
   sudo usermod -aG docker "$USER"
   sudo systemctl enable --now docker
 fi
-
-if [[ ${INSTALL_TAILSCALE:-false} == true ]] && ! command_exists tailscale; then
-  curl -fsSL https://tailscale.com/install.sh | sh
-fi
