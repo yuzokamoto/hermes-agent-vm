@@ -11,14 +11,19 @@ check() {
 }
 
 check "Supported Ubuntu LTS" bash -c 'source /etc/os-release; [[ "$ID" == ubuntu && ("$VERSION_ID" == 24.04* || "$VERSION_ID" == 26.04*) ]]'
-for cmd in git gh tmux node npm python3 uv docker codex claude promptfoo restic hermes; do
-  check "$cmd" command -v "$cmd"
+check "Ubuntu Desktop" dpkg-query -W ubuntu-desktop-minimal
+for cmd in git gh tmux mise node npm python3 uv codex claude promptfoo restic hermes; do
+  check "$cmd" bash -lc "command -v $cmd"
 done
-check "Hermes doctor" hermes doctor
+check "Hermes doctor" bash -lc 'hermes doctor'
 check "SSH service" systemctl is-active ssh
 check "Firewall" sudo ufw status
-check "Docker service" systemctl is-active docker
 check "VMware tools" systemctl is-active open-vm-tools
+
+if [[ ${INSTALL_DOCKER:-true} == true ]]; then
+  check "docker" command -v docker
+  check "Docker service" systemctl is-active docker
+fi
 
 if [[ ${BACKUP_ENABLED:-true} == true && -n ${RESTIC_PASSWORD:-} ]]; then
   check "Restic repository" env RESTIC_PASSWORD="$RESTIC_PASSWORD" restic -r "$RESTIC_REPOSITORY" check
