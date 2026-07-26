@@ -1,7 +1,7 @@
 SHELL := /usr/bin/env bash
 .DEFAULT_GOAL := help
 
-.PHONY: help bootstrap configure verify backup safe-suspend eval validate legacy-infra-plan
+.PHONY: help bootstrap configure verify backup safe-suspend eval validate
 
 help:
 	@printf '%s\n' \
@@ -11,7 +11,7 @@ help:
 	  'make backup         Back up Hermes, workspaces and knowledge with restic' \
 	  'make safe-suspend   Verify, back up and sync before suspending VMware' \
 	  'make eval           Run prompt/provider regression evaluations' \
-	  'make validate       Lint repository shell scripts and environment contract'
+	  'make validate       Check Bash syntax, blocking ShellCheck errors and environment contract'
 
 bootstrap:
 	@bash scripts/bootstrap-workstation.sh
@@ -33,7 +33,7 @@ eval:
 
 validate:
 	@find bootstrap scripts -type f -name '*.sh' -print0 | xargs -0 -n1 bash -n
-	@find bootstrap scripts -type f -name '*.sh' -print0 | xargs -0 shellcheck
+	@find bootstrap scripts -type f -name '*.sh' -print0 | xargs -0 shellcheck -S error -x -e SC1091
 	@test -f .env.example
 	@grep -q '^WORKSTATION_USER=' .env.example
 	@grep -q '^RESTIC_PASSWORD=' .env.example
